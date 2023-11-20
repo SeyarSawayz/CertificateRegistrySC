@@ -1,25 +1,33 @@
-import { useState } from "react";
-// import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import "./FileUpload.css";
+
+const readFileAsArrayBuffer = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+    reader.readAsArrayBuffer(file);
+  });
+};
 
 const FileUpload = ({ contract, account, provider }) => {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("No File Selected");
   const [pdfHash, setPdfHash] = useState(""); // Added state for PDF hash
-  const [image_hash, setImage_hash] = useState("");
+  const [ipfsaddress, setipfsAddress] = useState("");
 
+  // Function to handle file submission.
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let resFile; // Declare resFile here
+    let resFile;
+    let hash;
 
     if (file) {
       try {
-        // ... (Your existing code for uploading the file)
         const formData = new FormData();
         formData.append("file", file);
         resFile = await axios({
-          // Assign the response to resFile
           method: "post",
           url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
           data: formData,
@@ -31,35 +39,33 @@ const FileUpload = ({ contract, account, provider }) => {
           },
         });
 
-        // After uploading the file, calculate the PDF hash
         if (file.name.endsWith(".pdf")) {
-          // Check if the uploaded file is a PDF
-          const hash = await generatePDFHash(file);
+          hash = await generatePDFHash(file);
           setPdfHash(`PDF Hash: ${hash}`);
+          console.log(hash);
         } else {
           setPdfHash("Uploaded file is not a PDF.");
+          hash = "";
         }
-
-        // ... (The rest of your code)
       } catch (e) {
         alert("Unable to upload the file");
       }
 
       // Now you can use resFile here
-      const imageHash = `https://gateway.pinata.cloud/ipfs/${resFile.data.IpfsHash}`;
-      setImage_hash(imageHash);
+      const ipfsaddress = `https://gateway.pinata.cloud/ipfs/${resFile.data.IpfsHash}`;
+      setipfsAddress(ipfsaddress);
       const stName = document.querySelector("#st_name").value;
       const stRoll = document.querySelector("#st_roll").value;
       const passYear = document.querySelector("#st_year").value;
-      contract.add(account, stName, stRoll, passYear, imageHash, pdfHash);
-      console.log(stName, stRoll, passYear, imageHash, pdfHash);
+      contract.add(account, stName, stRoll, passYear, ipfsaddress, hash);
+      console.log(stName, stRoll, passYear, ipfsaddress, hash);
       alert("File Uploaded Successfully to IPFS");
       setFileName("No File Selected");
       setFile(null);
     }
   };
 
-  // Existing code for retrieving the uploaded file
+  // Function to handle file retrieval.
 
   const retrieveFile = async (e) => {
     const data = e.target.files[0];
@@ -73,7 +79,7 @@ const FileUpload = ({ contract, account, provider }) => {
     e.preventDefault();
   };
 
-  // Function to generate PDF hash
+  // Function to generate a PDF hash.
   const generatePDFHash = async (pdfFile) => {
     try {
       const pdfBuffer = await readFileAsArrayBuffer(pdfFile);
@@ -88,33 +94,45 @@ const FileUpload = ({ contract, account, provider }) => {
     }
   };
 
-  const readFileAsArrayBuffer = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-      reader.readAsArrayBuffer(file);
-    });
-  };
-
-  {
-    /* Get Docuemnt Hash and Diploma Smart Contract Code  */
-  }
-
+  // Function to fetch a diploma from the blockchain.
   const getDiploma = async (e) => {
     e.preventDefault();
-    const sname = document.querySelector("#studentName").value;
-    const sRoll = document.querySelector("#rollNumber").value;
-    const sPassYear = document.querySelector("#passingYear").value;
+    try {
+      const sname = document.querySelector("#studentName").value;
+      const sRoll = document.querySelector("#rollNumber").value;
+      const sPassYear = document.querySelector("#passingYear").value;
 
-    const result = await contract.getDocumentByStudent(sname, sRoll, sPassYear);
-    const url = result[0]; // Access the URL
-    const fileHash = result[1]; // Access the hash
+      const result = await contract.getDocumentByStudent(
+        sname,
+        sRoll,
+        sPassYear
+      );
 
-    console.log("URL:", url);
-    console.log("File Hash:", fileHash);
+      if (
+        !result ||
+        result.length === 0 ||
+        result[0] === "" ||
+        result[0] === "0x"
+      ) {
+        console.log(`${sname} is not registered.`);
+        alert(`${sname} is not registered in blockchain.`);
+      } else {
+        const url = result[0]; // Access the URL
+        const fileHash = result[1]; // Access the hash
+        console.log(
+          `This is ${sname}'s diploma with URL: ${url} and its hash: ${fileHash}`
+        );
+        alert(
+          `This is ${sname}'s diploma with URL: ${url} and its hash: ${fileHash}`
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching document:", error);
+      alert("Error fetching document.");
+    }
   };
 
+  // Component return statement with JSX.
   return (
     <div className="container">
       <div className="top">
@@ -158,18 +176,6 @@ const FileUpload = ({ contract, account, provider }) => {
             Upload
           </button>
           <br></br>
-          <div className="urlhash">
-            {pdfHash && <p className="hash">{pdfHash}</p>}{" "}
-            {/* Display the PDF hash if available */}
-            {image_hash && (
-              <p className="ipfs">
-                Document IPFS Address:
-                <a href={image_hash} target="_blank">
-                  Click to Open the file
-                </a>
-              </p>
-            )}{" "}
-          </div>
         </form>
       </div>
 

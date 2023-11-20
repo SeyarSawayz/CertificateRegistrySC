@@ -1,15 +1,14 @@
-.image-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  grid-gap: 10px;
-  grid-auto-rows: 350px;
-
-  margin: 10px;
+.pdf-list {
+  display: flex;
+  flex-direction: column;
+  /* grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); */
+  /* grid-gap: 10px; */
+  /* grid-auto-rows: 350px; */
 }
 
-.image-list img {
+.pdf-list img {
   width: 250px;
-  height: 350px;
+  height: 30px;
 }
 .center {
   margin: 40px;

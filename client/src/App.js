@@ -1,20 +1,10 @@
-import Upload from "./artifacts/contracts/Upload.sol/Upload.json";
+import Upload from "../src/artifacts/contracts/CertificateRegistrySC.sol/CertificateRegistrySC.json";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import FileUpload from "./components/FileUpload";
 import Display from "./components/Display";
 import Modal from "./components/Modal";
-// import { RouterProvider, createBrowserRouter } from "react-router-dom";
-// import { BrowserRouter, Outlet, Route, Link } from "react-router-dom";
 import "./App.css";
-
-// const router = createBrowserRouter([
-//   {
-//     path: "/",
-//     element: <FileUpload />,
-//   },
-//   { path: "/get-document", element: <GetDocument /> },
-// ]);
 
 function App() {
   const [account, setAccount] = useState("");
@@ -56,7 +46,8 @@ function App() {
 
   return (
     <>
-      {/* <RouterProvider router={router} /> */}
+      <title>Hello</title>
+
       {!modalOpen && (
         <button
           className="share"
@@ -72,7 +63,9 @@ function App() {
         <Modal setModalOpen={setModalOpen} contract={contract}></Modal>
       )}
       <div className="App">
-        <h1 style={{ color: "white" }}>Decentralized Diploma Verification</h1>
+        <h1 className="titlefont" style={{ color: "white" }}>
+          Decentralized Academic Diploma Verification
+        </h1>
         <div className="bg"></div>
         <div className="bg bg2"></div>
         <div className="bg bg3"></div>

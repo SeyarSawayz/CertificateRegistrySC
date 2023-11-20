@@ -20,23 +20,23 @@ const Display = ({ contract, account }) => {
         const str_array = str.split(",");
         const images = str_array.map((item, i) => {
           return (
-            <a href={item} key={i} target="_blank">
-              <img
-                key={i}
-                src={`https://gateway.pinata.cloud/ipfs/${item.substring(6)}`}
-                alt="New"
-                className="image-list"
-              ></img>
-            </a>
+            <div key={i} className="pdf-list">
+              <a
+                href={`https://gateway.pinata.cloud/ipfs/${item.substring(6)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Link to Student Diploma
+              </a>
+            </div>
           );
         });
         setData(images);
       } else {
-        alert("No image is selected");
+        alert("No Diploma is selected");
       }
     } catch (e) {
-      // console.error(e);
-      alert("You Don't have access please contact the owner");
+      alert("You Don't have access please contact the stuent");
     }
   };
   return (
@@ -48,7 +48,7 @@ const Display = ({ contract, account }) => {
         className="address"
       ></input>
       <button className="center button" onClick={getdata}>
-        Get Data
+        Get Diploma
       </button>
     </>
   );

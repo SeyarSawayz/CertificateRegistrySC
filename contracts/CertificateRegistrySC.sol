@@ -2,7 +2,7 @@
 pragma solidity >=0.5.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
-contract Upload {
+contract CertificateRegistrySC {
     struct Access {
         address user;
         bool access;
@@ -12,10 +12,10 @@ contract Upload {
         string url;
         string fileHash;
     }
-    mapping(address => string[]) value; // for display function by codeeater
-    mapping(bytes32 => Record) private records; // Use a mapping with a composite key
+    mapping(address => string[]) value; 
+    mapping(bytes32 => Record) private records; 
     mapping(address => mapping(bytes32 => bool)) ownership;
-    mapping(address => mapping(address=> bool)) ownerships; // this is for display function by codeEater
+    mapping(address => mapping(address=> bool)) ownerships; 
     mapping(address => Access[]) accessList;
     mapping(address => mapping(address => bool)) previousData;
 
